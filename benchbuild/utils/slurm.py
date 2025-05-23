@@ -8,6 +8,7 @@ import logging
 import os
 import sys
 import typing as tp
+from collections import defaultdict
 from functools import reduce
 from pathlib import Path
 
@@ -64,6 +65,29 @@ def __expand_project_versions__(experiment: Experiment) -> tp.Iterable[str]:
         for revision in experiment.sample(project_type):
             project = project_type(revision=revision)
             expanded.append(project.id)
+
+    project_dict = defaultdict(list)
+
+    if CFG["slurm"]["collate_projects"]:
+        # Iterate through the projects and group them by their base name
+        for project in expanded:
+            base_name = project.split('-')[0]
+            project_dict[base_name].append(project)
+
+        # Create a new list to hold the reordered projects
+        reordered_projects = []
+
+        # Get the maximum length of the grouped projects
+        max_length = max(len(group) for group in project_dict.values())
+
+        # Alternate between different projects
+        for i in range(max_length):
+            for group in project_dict.values():
+                if i < len(group):
+                    reordered_projects.append(group[i])
+
+        expanded = reordered_projects
+
     return expanded
 
 

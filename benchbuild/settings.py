@@ -272,6 +272,10 @@ CFG["slurm"] = {
     "container_runroot": {
         "default": None,
         "desc": "Runtime storage for containers"
+    },
+    "collate_projects": {
+        "default": False,
+        "desc": "Collate projects to alternate between different projects when generating SLURM scripts."
     }
 }
 
