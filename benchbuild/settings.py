@@ -96,6 +96,10 @@ CFG = s.Configuration(
                 "The name of the sequence that should be used for "
                 "preoptimization.",
             "default": "no_preperation"
+        },
+        "fetch_interval": {
+            "desc": "Maximum time passed in seconds since the last fetch.",
+            "default": 86400
         }
     }
 )

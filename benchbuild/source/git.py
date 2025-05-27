@@ -2,6 +2,7 @@
 Declare a git source.
 """
 import os
+import time
 import typing as tp
 import logging
 from pathlib import Path
@@ -11,6 +12,7 @@ from plumbum.commands.base import BoundCommand
 
 from benchbuild.utils.cmd import git, ln, mkdir
 
+from benchbuild.settings import CFG
 from . import base
 
 LOG = logging.getLogger(__name__)
@@ -73,7 +75,11 @@ class Git(base.FetchableSource):
             clone(self.remote, cache_path)
         else:
             with pb.local.cwd(cache_path):
-                fetch()
+                time_epoch = time.time()
+                stat_result = os.stat(f"{cache_path}/.git/FETCH_HEAD")
+
+                if (time_epoch - stat_result.st_mtime) > CFG["fetch_interval"].value:
+                    fetch()
 
         return cache_path
 
