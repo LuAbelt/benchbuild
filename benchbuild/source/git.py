@@ -76,9 +76,16 @@ class Git(base.FetchableSource):
         else:
             with pb.local.cwd(cache_path):
                 time_epoch = time.time()
-                stat_result = os.stat(f"{cache_path}/.git/FETCH_HEAD")
 
-                if (time_epoch - stat_result.st_mtime) > CFG["fetch_interval"].value:
+                fetch_head = Path(f"{cache_path}/.git/FETCH_HEAD")
+
+                if fetch_head.exists():
+                    stat_result = os.stat(f"{cache_path}/.git/FETCH_HEAD")
+                    needs_fetch = (time_epoch - stat_result.st_mtime) > CFG["fetch_interval"].value
+                else:
+                    needs_fetch = True
+
+                if needs_fetch:
                     fetch()
 
         return cache_path
