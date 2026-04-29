@@ -541,12 +541,13 @@ def __add_filters__(project: ProjectT, version_str: str) -> ProjectT:
             project's source.
     """
     version_in = yaml.safe_load(version_str)
+    sep = str(CFG["versions"]["separator"])
     if not project.SOURCE:
         return project
 
     def csv(in_str: tp.Union[tp.Any, str]) -> bool:
         if isinstance(in_str, str):
-            return len(in_str.split(CFG["versions"]["separator"])) > 1
+            return len(in_str.split(sep)) > 1
         return False
 
     is_csv = csv(version_in)
@@ -556,7 +557,7 @@ def __add_filters__(project: ProjectT, version_str: str) -> ProjectT:
         return __add_single_filter__(project, str(version_in))
 
     if isinstance(version_in, list) or is_csv:
-        version_in = version_in.split(CFG["versions"]["separator"]) if is_csv else version_in
+        version_in = version_in.split(sep) if is_csv else version_in
         return __add_indexed_filters__(project, version_in)
 
     if isinstance(version_in, dict):
