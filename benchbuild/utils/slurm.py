@@ -24,7 +24,7 @@ from benchbuild.utils.path import list_to_path
 from benchbuild.utils.requirements import (
     Requirement,
     get_slurm_options_from_config,
-    merge_slurm_options,
+    merge_slurm_options, SlurmRequirement,
 )
 
 LOG = logging.getLogger(__name__)
@@ -50,6 +50,11 @@ def script(experiment: 'Experiment', *subcommands: str) -> str:
         srun_args.append("--hint=nomultithread")
     if not CFG["slurm"]["turbo"]:
         srun_args.append("--pstate-turbo=off")
+
+    for requirement in experiment.REQUIREMENTS:
+        if isinstance(requirement, SlurmRequirement):
+            srun_args.append(requirement.to_slurm_cli_opt())
+        pass
 
     srun = srun[srun_args]
     srun = srun[benchbuild_c[subcommands]]
